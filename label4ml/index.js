@@ -11,7 +11,7 @@ const Store = require('electron-store');
 const store = new Store();
 const mystore = require('./mystore')
 const uuidgen = require('uuid/v4');
-
+const fs = require('fs')
 
 window.onresize = function (e) {
 }
@@ -23,11 +23,11 @@ document.addEventListener('DOMContentLoaded', function () {
     reload_targets()
 
     $('#btn_add_target').click(on_click_new_target)
-    $('#btn_add_module').click(on_click_new_module)
+    $('#btn_add_record').click(on_click_new_record)
 
     $('#btn_add_new_target').click(on_click_new_target)
     $('#btn_remove_target_confirm').click(on_click_remove_target_confirm)
-    $('#btn_delete_modules_confirm').click(on_click_delete_modules_confirm)
+    $('#btn_delete_records_confirm').click(on_click_delete_records_confirm)
 
     $('#btn_open_settings').click(function () {
         electron.ipcRenderer.send('open-settings')
@@ -37,11 +37,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     $('.head-tab').click(on_click_head_tab)
 
-    $('#btn_module_save').click(on_click_save_module)
+    $('#btn_record_save').click(on_click_save_record)
 
-    $('#input_module_name').keydown(on_module_name_change)
+    $('#input_record_name').keydown(on_record_name_change)
 
-    $('#btn_module_play').click(on_click_play_module)
+    $('#btn_record_play').click(on_click_play_record)
 })
 
 
@@ -99,7 +99,6 @@ function add_new_target_element(target) {
 
         menu.popup({ window: remote.getCurrentWindow() })
     })
-
 }
 
 function on_click_open_in_browser(target_element) {
@@ -124,29 +123,29 @@ function on_click_remove_target(target_element) {
     }
 }
 
-function on_click_remove_module(module_element) {
-    var r = confirm(`删除模块 ${module_element.web_module.name} ?`)
+function on_click_remove_record(record_element) {
+    var r = confirm(`删除模块 ${record_element.web_record.name} ?`)
     if (r == true) {
-        electron.ipcRenderer.send('remove-module', module_element.web_module.id)
+        electron.ipcRenderer.send('remove-record', record_element.web_record.id)
     }
 }
 
-electron.ipcRenderer.on("remove-module", (e, module_id) => {
-    g_module_map[module_id].remove()
-    delete g_module_map[module_id]
+electron.ipcRenderer.on("remove-record", (e, record_id) => {
+    g_record_map[record_id].remove()
+    delete g_record_map[record_id]
 })
 
-let g_under_delete_modules_element = null
+let g_under_delete_records_element = null
 
-function on_click_delete_modules(target_element) {
-    g_under_delete_modules_element = target_element
-    $('#delete_modules_dialog').find('#delete_modules_target_name').text(target_element.web_target.name)
-    $('#delete_modules_dialog').modal('show')
+function on_click_delete_records(target_element) {
+    g_under_delete_records_element = target_element
+    $('#delete_records_dialog').find('#delete_records_target_name').text(target_element.web_target.name)
+    $('#delete_records_dialog').modal('show')
 }
 
 function on_click_mark_all_read(target_element) {
     if (g_selected_target_element == target_element) {
-        $('.module').find('.module-indication').attr('type', '1')
+        $('.record').find('.record-indication').attr('type', '1')
     }
 
     target_element.find('.target-indication').attr('indication', 'false')
@@ -165,11 +164,11 @@ function on_click_remove_target_confirm() {
     g_under_config_target_element = null
 }
 
-function on_click_delete_modules_confirm() {
-    $('#delete_modules_dialog').modal('hide')
-    $('#module_list').empty()
-    electron.ipcRenderer.send('delete-modules', g_under_delete_modules_element.web_target.id)
-    g_under_delete_modules_element = null
+function on_click_delete_records_confirm() {
+    $('#delete_records_dialog').modal('hide')
+    $('#record_list').empty()
+    electron.ipcRenderer.send('delete-records', g_under_delete_records_element.web_target.id)
+    g_under_delete_records_element = null
 }
 
 function on_click_toggle_pause_target(target_element) {
@@ -224,15 +223,14 @@ electron.ipcRenderer.on('target-update', function (e, data) {
 
 let g_selected_target_element = null
 
-function on_select_target(target_id) {
+function on_select_target(target) {
 
     $('#help_space').hide()
-    $('#module_space').show()
+    $('#record_space').show()
     $('#content_space').show()
 
-    let element = g_target_map[target_id]
-    let target = element.web_target
-    console.log('click select element', target.name, target.id)
+    let element = g_target_map[target]
+    console.log('click select element', target)
 
     if (g_selected_target_element == element) {
         return
@@ -245,16 +243,41 @@ function on_select_target(target_id) {
     element.attr('select', 'true')
     g_selected_target_element = element
 
-    $('#module_list').empty()
-    g_module_map = {}
+    $('#record_list').empty()
+    g_record_map = {}
 
-    electron.ipcRenderer.send('get-all-modules', target.id)
+    reload_target_records()
+}
+
+let IMG_EXT_LIST = ['png','jpg', 'jpeg', 'bmp', 'gif', 'webp']
+function reload_target_records() {
+    let target = g_selected_target_element.web_target
+    console.log('reload target reocrds', target)
+
+    if (!fs.existsSync(target)) {
+        alert(`${target} ${utils.lg('不存在', "doesn't exist")}`)
+        return
+    }
+
+
+    fs.readdir(target, (err, files) => {
+        files.forEach(file => {
+            console.log(file);
+            let ext = utils.get_file_ext(file)
+            if (IMG_EXT_LIST.indexOf(ext) != -1) {
+                //is image
+                add_new_record_element(file)
+            }
+        });
+        //TODO should check file is real file
+        //https://stackoverflow.com/questions/2727167/how-do-you-get-a-list-of-the-names-of-all-files-present-in-a-directory-in-node-j
+    })
 }
 
 function unselect_target() {
-    g_selected_module_element = null
+    g_selected_record_element = null
     g_selected_target_element = null
-    $('#module_list').empty()
+    $('#record_list').empty()
     $('#html_diff').empty()
 }
 
@@ -274,12 +297,12 @@ function on_click_new_target() {
 }
 
 
-function on_click_new_module() {
-    console.log('click new module')
-    electron.ipcRenderer.send('new-module', {
+function on_click_new_record() {
+    console.log('click new record')
+    electron.ipcRenderer.send('new-record', {
         id: uuidgen(),
         target_id: g_selected_target_element.web_target.id,
-        name: "unamed module",
+        name: "unamed record",
         doc: '',
         config: '{}',
         codeout: '',
@@ -292,115 +315,110 @@ function on_click_new_module() {
     })
 }
 
-/* modules */
-electron.ipcRenderer.on('all-modules', function (e, modules) {
-    console.log('all modules', modules)
-    modules.forEach(function (module) {
-        add_new_module_element(module)
+/* records */
+electron.ipcRenderer.on('all-records', function (e, records) {
+    console.log('all records', records)
+    records.forEach(function (record) {
+        add_new_record_element(record)
     })
 })
 
-electron.ipcRenderer.on('new-module', function (e, module) {
-    console.log('new module', module)
-    add_new_module_element(module, true)
+electron.ipcRenderer.on('new-record', function (e, record) {
+    console.log('new record', record)
+    add_new_record_element(record, true)
 })
 
-let g_module_map = {}
+let g_record_map = {}
 
-function add_new_module_element(module, at_top = false) {
+function add_new_record_element(record) {
 
-    let root = g_selected_target_element.web_target.id == 'root'
-    let new_element = $('#module_template').clone()
+    let new_element = $('#record_template').clone()
     new_element.removeAttr('id')
-    new_element.find('.module-name').text(module.name)
-    new_element.find('.module-id').text(module.id.slice(0, 8).toUpperCase())
-    new_element.attr('title', module.id)
+    new_element.find('.record-name').text(record)
+    // new_element.find('.record-id').text(record.id.slice(0, 8).toUpperCase())
+    // new_element.attr('title', record.id)
 
-    new_element.web_module = module
-    if (at_top) {
-        new_element.prependTo('#module_list')
-    } else {
-        new_element.appendTo('#module_list')
-    }
+    new_element.web_record = record
+    new_element.appendTo('#record_list')
 
-    g_module_map[module.id] = new_element
-    new_element.click(on_select_module.bind(null, module.id))
+    g_record_map[record] = new_element
+    new_element.click(on_select_record.bind(null, record))
 
-    new_element.contextmenu(function (e) {
-        e.preventDefault()
-        const menu = new Menu()
+    // new_element.contextmenu(function (e) {
+    //     e.preventDefault()
+    //     const menu = new Menu()
 
-        menu.append(new MenuItem({
-            label: utils.lg('删除', 'Delete'),
-            click: on_click_remove_module.bind(null, new_element)
-        }))
+    //     menu.append(new MenuItem({
+    //         label: utils.lg('删除', 'Delete'),
+    //         click: on_click_remove_record.bind(null, new_element)
+    //     }))
 
-        menu.popup({ window: remote.getCurrentWindow() })
-    })
+    //     menu.popup({ window: remote.getCurrentWindow() })
+    // })
 }
 
-let g_selected_module_element = null
+let g_selected_record_element = null
 
-function on_select_module(module_id) {
-    let element = g_module_map[module_id]
-    let module = element.web_module
+function on_select_record(record_id) {
+    let element = g_record_map[record_id]
+    let record = element.web_record
 
-    if (g_selected_module_element == element) {
+    if (g_selected_record_element == element) {
         //same one, pass
         return
     }
 
     //unselect current
-    if (g_selected_module_element) {
-        g_selected_module_element.attr('select', 'false')
+    if (g_selected_record_element) {
+        g_selected_record_element.attr('select', 'false')
     }
 
     //select new
     element.attr('select', 'true')
-    g_selected_module_element = element
+    g_selected_record_element = element
 
-    $('#head_module_id').text(module.id.slice(0, 8).toUpperCase())
-    $('#input_module_name').val(module.name)
+    $('#head_record_id').text(record.id.slice(0, 8).toUpperCase())
+    $('#input_record_name').val(record.name)
 
-    g_editor_codeout.setValue(module.codeout)
-    g_editor_codein.setValue(module.codein)
-    g_editor_doc.setValue(module.doc)
+    g_editor_codeout.setValue(record.codeout)
+    g_editor_codein.setValue(record.codein)
+    g_editor_doc.setValue(record.doc)
     g_dirty = false
     refresh_save_dirty()
 }
-electron.ipcRenderer.on('menu-save-module', on_click_save_module)
-function on_click_save_module() {
-    console.log('save module')
-    if (g_selected_module_element) {
+electron.ipcRenderer.on('menu-save-record', on_click_save_record)
+function on_click_save_record() {
+    console.log('save record')
+    if (g_selected_record_element) {
         if (g_dirty) {
             g_dirty = false
             refresh_save_dirty()
 
-            let module = g_selected_module_element.web_module
-            module.name = $('#input_module_name').val()
-            module.doc = g_editor_doc.getValue()
-            module.codein = g_editor_codein.getValue()
-            module.codeout = g_editor_codeout.getValue()
-            g_selected_module_element.find('.module-name').text(module.name)
+            let record = g_selected_record_element.web_record
+            record.name = $('#input_record_name').val()
+            record.doc = g_editor_doc.getValue()
+            record.codein = g_editor_codein.getValue()
+            record.codeout = g_editor_codeout.getValue()
+            g_selected_record_element.find('.record-name').text(record.name)
 
-            electron.ipcRenderer.send('update-module', module)
+            electron.ipcRenderer.send('update-record', record)
         }
     } else {
         alert('没有选中任何模块')
     }
 }
 
-function on_module_name_change() {
-    if (g_selected_module_element) {
+function on_record_name_change() {
+    if (g_selected_record_element) {
         g_dirty = true
         refresh_save_dirty()
     }
 }
 
-electron.ipcRenderer.on('menu-play-module', on_click_play_module)
-function on_click_play_module() {
-    if (g_selected_module_element) {
-        electron.ipcRenderer.send('play-module', g_selected_module_element.web_module.id)
+electron.ipcRenderer.on('menu-play-record', on_click_play_record)
+function on_click_play_record() {
+    if (g_selected_record_element) {
+        electron.ipcRenderer.send('play-record', g_selected_record_element.web_record.id)
     } else {
         alert('没有选中任何模块')
     }

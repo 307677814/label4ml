@@ -240,7 +240,7 @@ function createMainWindow() {
 
         // Create the browser window.
         let main_win_option = {
-            width: 950,
+            width: 1450,
             height: 700
         }
 
