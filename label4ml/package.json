@@ -1,0 +1,40 @@
+{
+  "name": "label4ml",
+  "version": "0.1.0",
+  "productName": "label4ml",
+  "description": "Image labeling tool",
+  "main": "main.js",
+  "build": {
+    "appId": "com.netqon.label4ml",
+    "mac": {
+      "category": "public.app-category.productivity"
+    },
+    "win": {
+      "target": "nsis",
+      "extraFiles": "*.dll"
+    }
+  },
+  "repository": "https://github.com/fateleak/label4ml",
+  "keywords": [
+    "Netqon",
+    "BoringUniverse",
+    "fateleak"
+  ],
+  "author": "netqon.com",
+  "scripts": {
+    "postinstall": "install-app-deps",
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "dependencies": {
+    "electron-store": "^1.3.0",
+    "jsonfile": "^4.0.0",
+    "moment": "^2.19.3",
+    "uuid": "^3.1.0"
+  },
+  "devDependencies": {
+    "electron": "^2.0.0",
+    "electron-builder": "~20.17.0"
+  }
+}

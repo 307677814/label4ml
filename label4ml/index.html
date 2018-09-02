@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<!-- (C)2018 netqon.com all rights reserved. -->
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Netqon Label4ml </title>
+
+    <script>if (typeof module === 'object') {
+        window.module = module;
+        module = undefined;
+    }</script>
+    <link href="http://at.alicdn.com/t/font_819415_yfhj547lsx.css" rel="stylesheet"/>
+    <script src="libs/jquery.js"></script>
+    <script type="text/javascript" src="libs/bootstrap.js"></script>
+    <link rel="stylesheet" href="libs/bootstrap.css"/>
+    <script src="libs/jquery.scrollTo.min.js"></script>
+
+    <script>if (window.module) module = window.module;</script>
+
+    <link rel="stylesheet" type="text/css" href="index.css">
+
+</head>
+
+<body>
+<header id="window_header" class="drag">
+    <div id="head_folder" class="head_segments">
+
+        <a class="btn-head" id="btn_open_settings" title="Setting" title-cn="设置">
+            <i class="iconfont icon-settings btn-head-icon"></i>
+        </a>
+        <a class="btn-head" id="btn_add_target" title="New target" title-cn="打开文件夹">
+            <i class="iconfont icon-folderplus btn-head-icon"></i>
+        </a>
+    </div>
+    <div id="head_list" class="head_segments">
+        <div class="flex-push"></div>
+
+    </div>
+
+    <div id="head_edit" class="head_segments">
+        
+    </div>
+</header>
+<!-- head end -->
+<main id="total">
+
+    <!-- targets -->
+    <div id="target_space">
+
+        <div id="target_list">
+
+        </div>
+    </div>
+    <!-- target space end -->
+
+    <!--<div id="help_space">-->
+    <!--<webview>-->
+
+    <!--</webview>-->
+    <!--</div>-->
+    <div id="module_space">
+        <div id="module_list">
+        </div>
+    </div>
+
+
+    <div id="content_space">
+        <!--<div id="content_head">-->
+        <!--<div class="head-tab" pressed="true" tab-name="codeout">基础代码[F1]</div>-->
+        <!--<div class="flex-push"></div>-->
+        <!--<div class="head-tab" pressed="true" tab-name="codein">嵌入代码[F2]</div>-->
+        <!--<div class="flex-push"></div>-->
+        <!--<div class="head-tab" pressed="true" tab-name="doc">模块文档[F3]</div>-->
+        <!--</div>-->
+        <!--<div id="content_list"></div>-->
+        <div class="editor" id="editor_codeout"></div>
+        <div class="editor" id="editor_codein"></div>
+        <div class="editor" id="editor_doc"></div>
+
+    </div>
+
+</main>
+
+<div class="template">
+    <div class="module" id="module_template">
+        <div class="module-header">
+            <div class="module-name">module name</div>
+        </div>
+
+        <div class="module-footer">
+            <div class="module-id">module-id</div>
+        </div>
+    </div>
+
+    <div class="target" id="target_template">
+            <div class="target-name-line">
+                <div class="target-name-wraper">
+                    <span class="target-name">MacRumors</span>
+                </div>
+                <div class="flex-push"></div>
+            </div>
+            <div class="target-desc">
+                http://www.macrumors.com/index.html
+            </div>
+
+    </div>
+
+    <script>
+        require('./index.js')
+    </script>
+
+</div>
+</body>
+
+</html>
