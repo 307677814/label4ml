@@ -9,6 +9,7 @@ const { remote } = require('electron');
 const { Menu, MenuItem } = remote;
 const Store = require('electron-store');
 const store = new Store();
+const mystore = require('./mystore')
 const uuidgen = require('uuid/v4');
 
 
@@ -43,9 +44,13 @@ document.addEventListener('DOMContentLoaded', function () {
     $('#btn_module_play').click(on_click_play_module)
 })
 
+
 function reload_targets(){
-    let targets = store.get('targets', [])
+    let targets = mystore.get_targets()
     console.log('targets', targets)
+
+    $('#target_list').empty()
+    g_target_map = {}
 
     targets.forEach(target=>{
         add_new_target_element(target)
@@ -75,26 +80,21 @@ function add_new_target_element(target) {
     let new_element = $('#target_template').clone()
     new_element.removeAttr('id')
 
-    new_element.find('.target-name').text(target.name)
-    new_element.find('.target-desc').text(target.desc)
+    new_element.find('.target-name').text(target)
 
     new_element.prependTo('#target_list')
     new_element.web_target = target
-    g_target_map[target.id] = new_element
+    g_target_map[target] = new_element
 
-    new_element.click(on_select_target.bind(null, target.id))
+    new_element.click(on_select_target.bind(null, target))
 
     new_element.contextmenu(function (e) {
         e.preventDefault()
         const menu = new Menu()
 
         menu.append(new MenuItem({
-            label: utils.lg('删除', 'Delete'),
+            label: utils.lg('删除', 'Remove'),
             click: on_click_remove_target.bind(null, new_element)
-        }))
-        menu.append(new MenuItem({
-            label: utils.lg('属性', 'Edit'),
-            click: on_click_config_target.bind(null, new_element)
         }))
 
         menu.popup({ window: remote.getCurrentWindow() })
@@ -117,9 +117,11 @@ function on_click_check_immediately(target_element) {
 let g_under_removing_target_element = null
 
 function on_click_remove_target(target_element) {
-    g_under_removing_target_element = target_element
-    $('#remove_target_dialog').find('#remove_target_name').text(target_element.web_target.name)
-    $('#remove_target_dialog').modal('show')
+    let target = target_element.web_target
+    if (confirm(`${utils.lg('删除', 'Remove')} ${target} ?`)){
+        mystore.remove_target(target)
+        reload_targets()
+    }
 }
 
 function on_click_remove_module(module_element) {
@@ -259,11 +261,18 @@ function unselect_target() {
 function on_click_new_target() {
     let folder_name = electron.remote.dialog.showOpenDialog({properties: ['openDirectory']})
     console.log(folder_name)
+    if (folder_name && folder_name.length > 0) {
+        folder_name = folder_name[0]
+        if (mystore.get_targets().indexOf(folder_name) != -1) {
+            alert(utils.lg('这个文件夹早就被加入了', 'This folder has already been added'))
+        } else {
+            mystore.add_target(folder_name)
+        }
+    }
+
+    reload_targets()
 }
 
-function on_click_config_target(target_element) {
-    electron.ipcRenderer.send('open-edit-target', target_element.web_target.id)
-}
 
 function on_click_new_module() {
     console.log('click new module')
