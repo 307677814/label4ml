@@ -209,9 +209,11 @@ function on_select_record(record) {
 }
 
 let g_stage = null;
+let g_layer = null;
 let g_stage_width = 3000;
 let g_stage_height = 3000;
 let g_image = null
+let g_yoda = null
 function init_board() {
     g_stage = new Konva.Stage({
         container: 'container',
@@ -220,32 +222,30 @@ function init_board() {
     });
 
     // add canvas element
-    let layer = new Konva.Layer();
-    g_stage.add(layer);
+    g_layer = new Konva.Layer();
+    g_stage.add(g_layer);
 
     let imageObj = new Image();
     g_image = imageObj;
-    imageObj.onload = function () {
-
-        let yoda = new Konva.Image({
+    setTimeout(() => {
+        g_yoda = new Konva.Image({
             x: 0,
             y: 0,
             image: imageObj,
             width: imageObj.width,
             height: imageObj.height
         });
-        layer.add(yoda);
-        layer.draw();
+        g_layer.add(g_yoda);
+        g_layer.draw();
 
         g_stage.width(imageObj.width)
         g_stage.height(imageObj.height)
-
         $('#info_image_size').text(`size=${imageObj.width}x${imageObj.height}`)
-    }
+    }, 500);
 
     imageObj.src = '../test-images/a.jpg';
 
-    layer.draw();
+    g_layer.draw();
     setTimeout(refresh_stage_size, 1000)
     window.addEventListener('resize', refresh_stage_size);
 
@@ -297,17 +297,41 @@ function refresh_stage_size() {
     let containerWidth = container_parent.offsetWidth;
     console.log("size", containerWidth)
 
-    let scale = containerWidth / g_image.width;
-    g_stage.width(g_image.width * scale);
-    g_stage.height(container_parent.offsetWidth);
+    let scale_x = container_parent.offsetWidth / g_image.width;
+    let scale_y = container_parent.offsetHeight / g_image.height;
+    let scale = Math.min(scale_x, scale_y)
+    g_stage.width(container_parent.offsetWidth);
+    g_stage.height(container_parent.offsetHeight);
     g_stage.scale({ x: scale, y: scale });
     g_stage.draw();
     g_stage.position({ x: 0, y: 0 });
+    $('#info_scale').text(`${Math.round(1000 * g_stage.scaleX()) / 1000}`)
+
 }
 
 function reload_record(record) {
-}
+    g_layer.removeChildren()
+    g_image = new Image();
+    g_image.src = 'file://'+g_selected_target_element.web_target + '/' + record;
 
+    g_image.onload = () => {
+        g_yoda = new Konva.Image({
+            x: 0,
+            y: 0,
+            image: g_image,
+            width: g_image.width,
+            height: g_image.height
+        });
+        g_layer.add(g_yoda);
+        g_layer.draw();
+
+        g_stage.width(g_image.width)
+        g_stage.height(g_image.height)
+        $('#info_image_size').text(`size=${g_image.width}x${g_image.height}`)
+        refresh_stage_size()
+    }
+    g_layer.draw();
+}
 
 function init_keys() {
     window.addEventListener('keydown', function (event) {
