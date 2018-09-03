@@ -33,6 +33,8 @@ document.addEventListener('DOMContentLoaded', function () {
     $('iframe').attr('src', "http://label4ml.netqon.com/embedded.html?t=" + new Date().getTime())
 
     $('.head-tab').click(on_click_head_tab)
+
+    $('#btn_add_label').click(on_click_add_label)
 })
 
 
@@ -275,20 +277,38 @@ function init_board() {
 
     document.getElementById('content_space').addEventListener('mousemove', (event) => {
         // console.log(event)
-
-        let stage_pointer_pos = g_stage.getPointerPosition();
-        let stage_pos = g_stage.getPosition();
-        if (stage_pos && stage_pointer_pos) {
-            let scale = g_stage.scaleX()
-            let image_x = stage_pointer_pos.x - stage_pos.x;
-            let iamge_y = stage_pointer_pos.y - stage_pos.y;
-            image_x = image_x / scale;
-            iamge_y = iamge_y / scale;
-            console.log(image_x, iamge_y);
-            $('#info_cursor_pos').text(`x:${Math.round(image_x)}, y:${Math.round(iamge_y)}`);
-            $('#info_scale').text(`${Math.round(1000 * g_stage.scaleX()) / 1000}`)
+        let pos = get_real_pos()
+        if (pos) {
+            $('#info_cursor_pos').text(`x:${Math.round(pos.x)}, y:${Math.round(pos.y)}`);
         }
+        $('#info_scale').text(`${Math.round(1000 * g_stage.scaleX()) / 1000}`)
+        on_mousemove_add_label_routine()
     })
+
+
+    document.getElementById('content_space').addEventListener('click', (event) => {
+        console.log(event)
+
+        on_click_routine_add_label(event)
+    })
+}
+
+
+function get_real_pos() {
+
+    let stage_pointer_pos = g_stage.getPointerPosition();
+    let stage_pos = g_stage.getPosition();
+    if (stage_pos && stage_pointer_pos) {
+        let scale = g_stage.scaleX()
+        let image_x = stage_pointer_pos.x - stage_pos.x;
+        let image_y = stage_pointer_pos.y - stage_pos.y;
+        image_x = image_x / scale;
+        image_y = image_y / scale;
+        // console.log(image_x, image_y);
+        return {x:image_x, y:image_y}
+    } else {
+        return null
+    }
 }
 
 function refresh_stage_size() {
@@ -365,3 +385,77 @@ function exit_space_drag() {
 
 }
 
+let ADD_LABEL_STATE = {
+    IDLE:0,
+    TO_START:1,
+    TO_END:2
+}
+
+let g_add_label_state = ADD_LABEL_STATE.IDLE
+let g_start_pos = null
+let g_add_label_rect = null
+function on_click_add_label() {
+    //开始增加一个节点
+    if (g_selected_target_element && g_selected_record_element) {
+        g_add_label_state = ADD_LABEL_STATE.TO_START
+    }
+}
+
+function on_click_routine_add_label(event) {
+    let pos = get_real_pos();
+    if (pos) {
+        if (g_add_label_state == ADD_LABEL_STATE.TO_START) {
+            g_start_pos = pos;
+            g_add_label_state = ADD_LABEL_STATE.TO_END;
+            let tmp_pos = get_real_pos()
+
+
+            g_add_label_rect = new Konva.Rect({
+                x: tmp_pos.x,
+                y: tmp_pos.y,
+                width: 0,
+                height: 0,
+                fill: 'green',
+                stroke: 'black',
+                strokeWidth: 4
+            });
+        
+            // add the shape to the layer
+            g_layer.add(g_add_label_rect);
+            g_layer.draw()
+
+        } else if (g_add_label_state == ADD_LABEL_STATE.TO_END) {
+            console.log('end at', pos)
+            g_add_label_state = ADD_LABEL_STATE.IDLE
+            g_add_label_rect.destroy()
+            g_layer.draw()
+            let tmp_pos = get_real_pos()
+            add_new_label(g_start_pos, tmp_pos)
+        }
+    }
+}
+
+function on_mousemove_add_label_routine() {
+    if (g_add_label_state == ADD_LABEL_STATE.TO_END) {   
+        let tmp_pos = get_real_pos()
+        g_add_label_rect.width(tmp_pos.x - g_start_pos.x)
+        g_add_label_rect.height(tmp_pos.y - g_start_pos.y)
+        g_layer.draw()
+    }
+}
+
+function add_new_label(start_pos, end_pos) {
+
+    let label_rect = new Konva.Rect({
+        x: start_pos.x,
+        y: start_pos.y,
+        width: end_pos.x - start_pos.x,
+        height: end_pos.y - start_pos.y,
+        fill: 'blue',
+        stroke: 'red',
+        strokeWidth: 2
+    });
+    g_layer.add(label_rect)
+    g_layer.draw()
+
+}
