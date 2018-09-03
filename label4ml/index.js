@@ -35,6 +35,9 @@ document.addEventListener('DOMContentLoaded', function () {
     $('.head-tab').click(on_click_head_tab)
 
     $('#btn_add_label').click(on_click_add_label)
+    $('#btn_delete_label').click(on_click_delete_label)
+
+    $('#btn_save').click(on_click_save)
 })
 
 
@@ -216,6 +219,7 @@ let g_stage_width = 3000;
 let g_stage_height = 3000;
 let g_image = null
 let g_yoda = null
+let g_selected_label_rect = null
 function init_board() {
     g_stage = new Konva.Stage({
         container: 'container',
@@ -252,6 +256,35 @@ function init_board() {
     window.addEventListener('resize', refresh_stage_size);
 
     let scaleBy = 1.05;
+
+
+    g_stage.on('click', function (e) {
+        // if click on empty area - remove all transformers
+        if (e.target === g_stage) {
+            g_stage.find('Transformer').destroy();
+            g_layer.draw();
+          return;
+        }
+        // do nothing if clicked NOT on our rectangles
+        if (!e.target.hasName('label')) {
+          g_stage.find('Transformer').destroy();
+          g_layer.draw();
+          return;
+        }
+        // remove old transformers
+        // TODO: we can skip it if current rect is already selected
+        g_stage.find('Transformer').destroy();
+  
+        // create new transformer
+        var tr = new Konva.Transformer({
+            rotateEnabled: false
+        });
+        g_layer.add(tr);
+        tr.attachTo(e.target);
+        g_layer.draw();
+        g_selected_label_rect = e.target;
+        make_dirty()
+      })
 
     document.getElementById('content_space').addEventListener('wheel', (e) => {
         e.preventDefault();
@@ -402,6 +435,16 @@ function on_click_add_label() {
     }
 }
 
+function on_click_delete_label() {
+    console.log("delete label", g_selected_label_rect)
+    if (g_selected_label_rect) {
+        g_selected_label_rect.destroy()
+        g_stage.find('Transformer').destroy();
+        g_layer.draw()
+        make_dirty()
+    }
+}
+
 function gp(ft) {
     return Math.round(ft)
 }
@@ -474,9 +517,33 @@ function add_new_label(start_pos, end_pos) {
         stroke: 'red',
         strokeWidth: 4,
         opacity: 0.5,
-        draggable: true
+        draggable: true,
+        name: 'label'
+    });
+    label_rect.on('dragend', function() {
+        make_dirty()
     });
     g_layer.add(label_rect)
     g_layer.draw()
+    make_dirty()
 
+}
+
+let g_dirty  = false
+function make_dirty() {
+    g_dirty = true
+    on_dirty_change()
+}
+function on_dirty_change() {
+    if (g_dirty){
+        $('#btn_save').css('background', 'red')
+        $('#btn_save').css('color', 'white')
+    } else {
+        $('#btn_save').removeAttr('style')
+    }
+}
+
+function on_click_save() {
+    g_dirty = false
+    on_dirty_change()
 }
