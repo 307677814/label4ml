@@ -36,14 +36,14 @@ document.addEventListener('DOMContentLoaded', function () {
 })
 
 
-function reload_targets(){
+function reload_targets() {
     let targets = mystore.get_targets()
     console.log('targets', targets)
 
     $('#target_list').empty()
     g_target_map = {}
 
-    targets.forEach(target=>{
+    targets.forEach(target => {
         add_new_target_element(target)
     })
 }
@@ -96,7 +96,7 @@ function send_cmd(data) {
 
 function on_click_remove_target(target_element) {
     let target = target_element.web_target
-    if (confirm(`${utils.lg('删除', 'Remove')} ${target} ?`)){
+    if (confirm(`${utils.lg('删除', 'Remove')} ${target} ?`)) {
         mystore.remove_target(target)
         reload_targets()
     }
@@ -130,7 +130,7 @@ function on_select_target(target) {
     reload_target_records()
 }
 
-let IMG_EXT_LIST = ['png','jpg', 'jpeg', 'bmp', 'gif', 'webp']
+let IMG_EXT_LIST = ['png', 'jpg', 'jpeg', 'bmp', 'gif', 'webp']
 function reload_target_records() {
     let target = g_selected_target_element.web_target
     console.log('reload target reocrds', target)
@@ -156,7 +156,7 @@ function reload_target_records() {
 }
 
 function on_click_new_target() {
-    let folder_name = electron.remote.dialog.showOpenDialog({properties: ['openDirectory']})
+    let folder_name = electron.remote.dialog.showOpenDialog({ properties: ['openDirectory'] })
     console.log(folder_name)
     if (folder_name && folder_name.length > 0) {
         folder_name = folder_name[0]
@@ -209,9 +209,9 @@ function on_select_record(record) {
 }
 
 let g_stage = null;
-let g_stage_width = 1000;
-let g_stage_height = 1000;
-
+let g_stage_width = 3000;
+let g_stage_height = 3000;
+let g_image = null
 function init_board() {
     g_stage = new Konva.Stage({
         container: 'container',
@@ -223,31 +223,34 @@ function init_board() {
     let layer = new Konva.Layer();
     g_stage.add(layer);
 
-
-
     let imageObj = new Image();
-    imageObj.onload = function() {
+    g_image = imageObj;
+    imageObj.onload = function () {
 
-      let yoda = new Konva.Image({
-        x: 0,
-        y: 0,
-        image: imageObj,
-        width: imageObj.width,
-        height: imageObj.height
-      });
-      layer.add(yoda);
-      layer.draw();
+        let yoda = new Konva.Image({
+            x: 0,
+            y: 0,
+            image: imageObj,
+            width: imageObj.width,
+            height: imageObj.height
+        });
+        layer.add(yoda);
+        layer.draw();
+
+        g_stage.width(imageObj.width)
+        g_stage.height(imageObj.height)
+
+        $('#info_image_size').text(`size=${imageObj.width}x${imageObj.height}`)
     }
 
     imageObj.src = '../test-images/a.jpg';
 
     layer.draw();
-    refresh_stage_size()
+    setTimeout(refresh_stage_size, 1000)
     window.addEventListener('resize', refresh_stage_size);
 
-
     let scaleBy = 1.05;
-    
+
     document.getElementById('content_space').addEventListener('wheel', (e) => {
         e.preventDefault();
         let oldScale = g_stage.scaleX();
@@ -266,7 +269,26 @@ function init_board() {
         };
         g_stage.position(newPos);
         g_stage.batchDraw();
+        $('#info_scale').text(`${Math.round(1000 * g_stage.scaleX()) / 1000}`)
+
     });
+
+    document.getElementById('content_space').addEventListener('mousemove', (event) => {
+        // console.log(event)
+
+        let stage_pointer_pos = g_stage.getPointerPosition();
+        let stage_pos = g_stage.getPosition();
+        if (stage_pos && stage_pointer_pos) {
+            let scale = g_stage.scaleX()
+            let image_x = stage_pointer_pos.x - stage_pos.x;
+            let iamge_y = stage_pointer_pos.y - stage_pos.y;
+            image_x = image_x / scale;
+            iamge_y = iamge_y / scale;
+            console.log(image_x, iamge_y);
+            $('#info_cursor_pos').text(`x:${Math.round(image_x)}, y:${Math.round(iamge_y)}`);
+            $('#info_scale').text(`${Math.round(1000 * g_stage.scaleX()) / 1000}`)
+        }
+    })
 }
 
 function refresh_stage_size() {
@@ -275,15 +297,12 @@ function refresh_stage_size() {
     let containerWidth = container_parent.offsetWidth;
     console.log("size", containerWidth)
 
-    let scale = containerWidth / g_stage_width;
-
-
-    g_stage.width(g_stage_width * scale);
-    g_stage.height(g_stage_height * scale);
+    let scale = containerWidth / g_image.width;
+    g_stage.width(g_image.width * scale);
+    g_stage.height(container_parent.offsetWidth);
     g_stage.scale({ x: scale, y: scale });
     g_stage.draw();
-    g_stage.position({x:0, y:0});
-
+    g_stage.position({ x: 0, y: 0 });
 }
 
 function reload_record(record) {
@@ -291,9 +310,9 @@ function reload_record(record) {
 
 
 function init_keys() {
-    window.addEventListener('keydown', function(event){
+    window.addEventListener('keydown', function (event) {
         // console.log(event)
-        switch(event.keyCode){
+        switch (event.keyCode) {
             case 32:
                 enter_space_drag();
                 break
@@ -301,9 +320,9 @@ function init_keys() {
     })
 
 
-    window.addEventListener('keyup', function(event){
+    window.addEventListener('keyup', function (event) {
         // console.log(event)
-        switch(event.keyCode) {
+        switch (event.keyCode) {
             case 32:
                 exit_space_drag();
                 break

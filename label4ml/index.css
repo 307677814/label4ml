@@ -10,6 +10,7 @@
 
     --system-target-width: 155px;
     --system-record-width: 200px;
+    --system-info-width: 200px;
   }
 
 body{
@@ -132,7 +133,7 @@ select[disabled="disabled"]{
 /* main area */
 #total{
     display: grid;
-    grid-template-columns: auto auto 1fr;
+    grid-template-columns: auto auto 1fr auto;
     width: 100vw;
 }
 
@@ -157,14 +158,19 @@ select[disabled="disabled"]{
 
 #content_space{
     min-height: calc(100vh - 30px);
-    width: calc(100vw - var(--system-record-width) - var(--system-target-width))
+    width: calc(100vw - var(--system-record-width) - var(--system-target-width) - var(--system-info-width))
+}
+
+#info_space{
+    width:  var(--system-info-width);
+    background: #d4d4d4;
+    padding: 5px;
 }
 
 .flex-push{
     flex-grow: 1;
 }
 
-/* header common */
 .space-header{
     position: fixed;
     bottom: 0px;
@@ -189,7 +195,7 @@ select[disabled="disabled"]{
 #target_space{
     flex-shrink: 0;
     background: rgb(55, 55, 55);
-    width: var(--system-target-width)
+    width: var(--system-target-width);
     height: calc(100vh - 30px);
 }
 
@@ -334,4 +340,13 @@ input{
 #head_record_id{
     font-size:12px;
     color: #0D47A1;
+}
+
+.panel-head{
+    background: #504d63;
+    color: #e7e7e7;
+}
+
+#info_board{
+    font-family: 'Courier New', Courier, monospace;
 }

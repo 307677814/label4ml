@@ -7,13 +7,13 @@
     <title>Netqon Label4ml </title>
 
     <script>if (typeof module === 'object') {
-        window.module = module;
-        module = undefined;
-    }</script>
-    <link href="http://at.alicdn.com/t/font_819415_yfhj547lsx.css" rel="stylesheet"/>
+            window.module = module;
+            module = undefined;
+        }</script>
+    <link href="http://at.alicdn.com/t/font_819415_yfhj547lsx.css" rel="stylesheet" />
     <script src="libs/jquery.js"></script>
     <script type="text/javascript" src="libs/bootstrap.js"></script>
-    <link rel="stylesheet" href="libs/bootstrap.css"/>
+    <link rel="stylesheet" href="libs/bootstrap.css" />
     <script src="libs/jquery.scrollTo.min.js"></script>
     <script src="https://cdn.rawgit.com/konvajs/konva/2.3.0/konva.min.js"></script>
 
@@ -24,57 +24,75 @@
 </head>
 
 <body>
-<header id="window_header" class="drag">
-    <div id="head_target" class="head_segments">
+    <header id="window_header" class="drag">
+        <div id="head_target" class="head_segments">
 
-        <a class="btn-head" id="btn_open_settings" title="Setting" title-cn="设置">
-            <i class="iconfont icon-settings btn-head-icon"></i>
-        </a>
-        <a class="btn-head" id="btn_add_target" title="New Workspace(folder)" title-cn="新增工作区">
-            <i class="iconfont icon-folderplus btn-head-icon"></i>
-        </a>
-    </div>
-    <div id="head_record" class="head_segments">
-        <div class="flex-push"></div>
-
-    </div>
-
-    <div id="head_content" class="head_segments">
-        
-    </div>
-</header>
-<!-- head end -->
-<main id="total">
-
-    <div id="target_space">
-        <div id="target_list">
+            <a class="btn-head" id="btn_open_settings" title="Setting" title-cn="设置">
+                <i class="iconfont icon-settings btn-head-icon"></i>
+            </a>
+            <a class="btn-head" id="btn_add_target" title="New Workspace(folder)" title-cn="新增工作区">
+                <i class="iconfont icon-folderplus btn-head-icon"></i>
+            </a>
         </div>
-    </div>
-    <div id="record_space">
-        <div id="record_list">
+        <div id="head_record" class="head_segments">
+            <div class="flex-push"></div>
+
         </div>
+
+        <div id="head_content" class="head_segments">
+
+        </div>
+    </header>
+    <!-- head end -->
+    <main id="total">
+
+        <div id="target_space">
+            <div id="target_list">
+            </div>
+        </div>
+        <div id="record_space">
+            <div id="record_list">
+            </div>
+        </div>
+
+        <div id="content_space">
+            <div id="container"></div>
+        </div>
+
+        <div id="info_space">
+            <div id="info_board">
+                <div class="panel-head">info board</div>
+                <div>
+                    <div id="info_image_size">size=1200x800</div>
+                    <div id="info_scale">scale=1.0</div>
+                    <div id="info_cursor_pos">x:0,y:0</div>
+                </div>
+            </div>
+            <div id="label_board">
+                    <div class="panel-head">label list</div>
+                    <div id="label_list">
+
+                    </div>
+                </div>
+
+        </div>
+
+    </main>
+
+    <div class="template">
+        <div class="record" id="record_template">
+            <div class="record-name">record name</div>
+        </div>
+
+        <div class="target" id="target_template">
+            <span class="target-name">MacRumors</span>
+        </div>
+
+        <script>
+            require('./index.js')
+        </script>
+
     </div>
-
-    <div id="content_space">
-        <div id="container"></div>
-    </div>
-
-</main>
-
-<div class="template">
-    <div class="record" id="record_template">
-        <div class="record-name">record name</div>
-    </div>
-
-    <div class="target" id="target_template">
-        <span class="target-name">MacRumors</span>
-    </div>
-
-    <script>
-        require('./index.js')
-    </script>
-
-</div>
 </body>
 
 </html>
