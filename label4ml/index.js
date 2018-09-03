@@ -473,7 +473,7 @@ function on_click_routine_add_label(event) {
                 y: tmp_pos.y-30,
                 text: `w:0,h:0`,
                 fontSize: 30,
-                fill: 'green',
+                fill: 'orange',
                 fontFamily: 'Calibri'
             });
 
@@ -547,4 +547,15 @@ function on_dirty_change() {
 function on_click_save() {
     g_dirty = false
     on_dirty_change()
+
+    let label_rects = g_stage.find('.label')
+    let data = ''
+    label_rects.each(function(label_rect){
+        console.log(label_rect)
+        console.log(label_rect.x(), label_rect.y(), label_rect.width(), label_rect.height())
+        data += `${Math.round(label_rect.x())},${Math.round(label_rect.y())},${Math.round(label_rect.width())},${Math.round(label_rect.height())}\n`
+    })
+    fs.writeFile(g_selected_target_element.web_target + '/' + g_selected_record_element.web_record + '.label', data, ()=>{
+        console.log('writed')
+    })
 }
