@@ -6,7 +6,7 @@ macOS/Windows/Linux
 
 ![](scrash/a.jpg)
 
-![](scrash/b.png)
+![](scrash/b.jpg)
 
 liscense: MIT
 
