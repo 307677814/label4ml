@@ -7,6 +7,9 @@
     --system-hover-color: rgb(216, 216, 216);
     --system-active-color: rgb(185, 219, 219);
     --system-selected-color: rgb(203, 213, 223);
+
+    --system-target-width: 155px;
+    --system-record-width: 200px;
   }
 
 body{
@@ -40,7 +43,7 @@ select[disabled="disabled"]{
     border-bottom: 1px solid var(--system-split-color);
     background: var(--system-bg1-color);
     display: grid;
-    grid-template-columns: 155px 155px 1fr;
+    grid-template-columns: var(--system-target-width) var(--system-record-width) 1fr;
     border-bottom: 1px var(--system-split-color) solid;
 }
 
@@ -78,21 +81,15 @@ select[disabled="disabled"]{
     align-items: center;
 }
 
-#head_folder{
+#head_target{
     text-align: right;
     flex-direction: row-reverse;
 }
 
-#head_list{
-    width: 155px;
+#head_record{
 }
 
-#head_edit_src{
-    padding-right: 0px;
-}
-
-#head_edit{
-    padding-left: 0px;
+#head_content{
 }
 
 .head-block{
@@ -136,6 +133,7 @@ select[disabled="disabled"]{
 #total{
     display: grid;
     grid-template-columns: auto auto 1fr;
+    width: 100vw;
 }
 
 .my-text-primary{
@@ -154,26 +152,14 @@ select[disabled="disabled"]{
     overflow: auto;
     background: #F7F7F7;    
     min-height: calc(100vh - 30px);
-    width: 200px;
+    width: var(--system-record-width);
 }
 
 #content_space{
     min-height: calc(100vh - 30px);
-    width: 100%;
-    grid-template-columns: 1fr 1fr 1fr;
-    display: grid;
+    width: calc(100vw - var(--system-record-width) - var(--system-target-width))
 }
 
-#content_head{
-    height: 30px;
-    width: 100%;
-    display: flex;
-}
-#content_list{
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    height: calc(100vh - 60px);
-}
 .flex-push{
     flex-grow: 1;
 }
@@ -203,14 +189,14 @@ select[disabled="disabled"]{
 #target_space{
     flex-shrink: 0;
     background: rgb(55, 55, 55);
-    width: 155px;
+    width: var(--system-target-width)
     height: calc(100vh - 30px);
 }
 
 #target_list{
     max-height: calc(100vh - 30px);
     overflow: auto;    
-    width: 155px;
+    width: var(--system-target-width);
 }
 
 #fill_target_space{

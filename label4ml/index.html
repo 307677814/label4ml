@@ -15,6 +15,7 @@
     <script type="text/javascript" src="libs/bootstrap.js"></script>
     <link rel="stylesheet" href="libs/bootstrap.css"/>
     <script src="libs/jquery.scrollTo.min.js"></script>
+    <script src="https://cdn.rawgit.com/konvajs/konva/2.3.0/konva.min.js"></script>
 
     <script>if (window.module) module = window.module;</script>
 
@@ -24,7 +25,7 @@
 
 <body>
 <header id="window_header" class="drag">
-    <div id="head_folder" class="head_segments">
+    <div id="head_target" class="head_segments">
 
         <a class="btn-head" id="btn_open_settings" title="Setting" title-cn="设置">
             <i class="iconfont icon-settings btn-head-icon"></i>
@@ -33,51 +34,29 @@
             <i class="iconfont icon-folderplus btn-head-icon"></i>
         </a>
     </div>
-    <div id="head_list" class="head_segments">
+    <div id="head_record" class="head_segments">
         <div class="flex-push"></div>
 
     </div>
 
-    <div id="head_edit" class="head_segments">
+    <div id="head_content" class="head_segments">
         
     </div>
 </header>
 <!-- head end -->
 <main id="total">
 
-    <!-- targets -->
     <div id="target_space">
-
         <div id="target_list">
-
         </div>
     </div>
-    <!-- target space end -->
-
-    <!--<div id="help_space">-->
-    <!--<webview>-->
-
-    <!--</webview>-->
-    <!--</div>-->
     <div id="record_space">
         <div id="record_list">
         </div>
     </div>
 
-
     <div id="content_space">
-        <!--<div id="content_head">-->
-        <!--<div class="head-tab" pressed="true" tab-name="codeout">基础代码[F1]</div>-->
-        <!--<div class="flex-push"></div>-->
-        <!--<div class="head-tab" pressed="true" tab-name="codein">嵌入代码[F2]</div>-->
-        <!--<div class="flex-push"></div>-->
-        <!--<div class="head-tab" pressed="true" tab-name="doc">模块文档[F3]</div>-->
-        <!--</div>-->
-        <!--<div id="content_list"></div>-->
-        <div class="editor" id="editor_codeout"></div>
-        <div class="editor" id="editor_codein"></div>
-        <div class="editor" id="editor_doc"></div>
-
+        <div id="container"></div>
     </div>
 
 </main>
