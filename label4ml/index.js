@@ -384,6 +384,21 @@ function reload_record(record) {
         refresh_stage_size()
     }
     g_layer.draw();
+
+
+    if (fs.existsSync(get_current_label_file())) {
+        fs.readFile(get_current_label_file(), (err, data)=>{
+            let text = data.toString()
+            console.log(text)
+            let lines = text.split('\n')
+            lines.forEach(line=>{
+                let ww = line.split(',')
+                if (ww.length == 4){
+                    add_new_label(parseInt(ww[0]),parseInt(ww[1]),parseInt(ww[2]),parseInt(ww[3]))
+                }
+            })
+        })
+    }
 }
 
 function init_keys() {
@@ -489,7 +504,8 @@ function on_click_routine_add_label(event) {
             g_add_label_text.destroy()
             g_layer.draw()
             let tmp_pos = get_real_pos()
-            add_new_label(g_start_pos, tmp_pos)
+            add_new_label(g_start_pos.x, g_start_pos.y, tmp_pos.x - g_start_pos.x, tmp_pos.y - g_start_pos.y)
+            make_dirty()
         }
     }
 }
@@ -506,18 +522,18 @@ function on_mousemove_add_label_routine() {
     }
 }
 
-function add_new_label(start_pos, end_pos) {
+function add_new_label(x,y,w,h) {
 
     let label_rect = new Konva.Rect({
-        x: start_pos.x,
-        y: start_pos.y,
-        width: end_pos.x - start_pos.x,
-        height: end_pos.y - start_pos.y,
+        x: x,
+        y: y,
+        width: w,
+        height: h,
         fill: 'blue',
         // fillEnabled: false,
-        stroke: 'lime',
+        stroke: 'red',
         strokeWidth: 3,
-        opacity: 0.7,
+        opacity: 0.5,
         draggable: true,
         name: 'label'
     });
@@ -526,7 +542,6 @@ function add_new_label(start_pos, end_pos) {
     });
     g_layer.add(label_rect)
     g_layer.draw()
-    make_dirty()
 
 }
 
@@ -544,6 +559,10 @@ function on_dirty_change() {
     }
 }
 
+function get_current_label_file() {
+   return path.join(g_selected_target_element.web_target, g_selected_record_element.web_record + '.label')
+}
+
 function on_click_save() {
     g_dirty = false
     on_dirty_change()
@@ -553,9 +572,9 @@ function on_click_save() {
     label_rects.each(function(label_rect){
         console.log(label_rect)
         console.log(label_rect.x(), label_rect.y(), label_rect.width(), label_rect.height())
-        data += `${Math.round(label_rect.x())},${Math.round(label_rect.y())},${Math.round(label_rect.width())},${Math.round(label_rect.height())}\n`
+        data += `${Math.round(label_rect.x())},${Math.round(label_rect.y())},${Math.round(label_rect.width()*label_rect.scaleX())},${Math.round(label_rect.height()*label_rect.scaleY())}\n`
     })
-    fs.writeFile(g_selected_target_element.web_target + '/' + g_selected_record_element.web_record + '.label', data, ()=>{
+    fs.writeFile(get_current_label_file(), data, ()=>{
         console.log('writed')
     })
 }
