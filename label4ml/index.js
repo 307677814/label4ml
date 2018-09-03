@@ -143,7 +143,7 @@ function reload_target_records() {
 
     fs.readdir(target, (err, files) => {
         files.forEach(file => {
-            console.log(file);
+            // console.log(file);
             let ext = utils.get_file_ext(file)
             if (IMG_EXT_LIST.indexOf(ext) != -1) {
                 //is image
@@ -205,7 +205,7 @@ function on_select_record(record) {
     element.attr('select', 'true')
     g_selected_record_element = element
 
-    reload_target_records(record)
+    reload_record(record)
 }
 
 let g_stage = null;
@@ -247,7 +247,8 @@ function init_board() {
 
 
     let scaleBy = 1.05;
-    window.addEventListener('wheel', (e) => {
+    
+    document.getElementById('content_space').addEventListener('wheel', (e) => {
         e.preventDefault();
         let oldScale = g_stage.scaleX();
 
