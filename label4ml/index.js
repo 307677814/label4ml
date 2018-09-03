@@ -427,20 +427,23 @@ function on_click_routine_add_label(event) {
 
             g_add_label_text = new Konva.Text({
                 x: tmp_pos.x,
-                y: tmp_pos.y,
+                y: tmp_pos.y-30,
                 text: `w:0,h:0`,
                 fontSize: 30,
+                fill: 'green',
                 fontFamily: 'Calibri'
             });
 
             // add the shape to the layer
             g_layer.add(g_add_label_rect);
+            g_layer.add(g_add_label_text);
             g_layer.draw()
 
         } else if (g_add_label_state == ADD_LABEL_STATE.TO_END) {
             console.log('end at', pos)
             g_add_label_state = ADD_LABEL_STATE.IDLE
             g_add_label_rect.destroy()
+            g_add_label_text.destroy()
             g_layer.draw()
             let tmp_pos = get_real_pos()
             add_new_label(g_start_pos, tmp_pos)
@@ -469,7 +472,7 @@ function add_new_label(start_pos, end_pos) {
         height: end_pos.y - start_pos.y,
         fill: 'pink',
         stroke: 'red',
-        strokeWidth: 2,
+        strokeWidth: 4,
         opacity: 0.5,
         draggable: true
     });
