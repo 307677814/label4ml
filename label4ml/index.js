@@ -513,10 +513,11 @@ function add_new_label(start_pos, end_pos) {
         y: start_pos.y,
         width: end_pos.x - start_pos.x,
         height: end_pos.y - start_pos.y,
-        fill: 'pink',
-        stroke: 'red',
-        strokeWidth: 4,
-        opacity: 0.5,
+        fill: 'blue',
+        // fillEnabled: false,
+        stroke: 'lime',
+        strokeWidth: 3,
+        opacity: 0.7,
         draggable: true,
         name: 'label'
     });
