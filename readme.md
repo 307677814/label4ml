@@ -4,5 +4,8 @@ Simple image labelling toolkit for machine learning.
 
 macOS/Windows/Linux
 
+![](scrash/a.jpg)
+
+liscense: MIT
 
 (C) 2018 netqon.com

@@ -93,7 +93,7 @@ function add_new_target_element(target) {
 
         menu.append(new MenuItem({
             label: utils.lg('查看', 'Reveal'),
-            click: ()=>{
+            click: () => {
                 electron.remote.shell.openItem(target)
             }
         }))
@@ -270,18 +270,18 @@ function init_board() {
         if (e.target === g_stage) {
             g_stage.find('Transformer').destroy();
             g_layer.draw();
-          return;
+            return;
         }
         // do nothing if clicked NOT on our rectangles
         if (!e.target.hasName('label')) {
-          g_stage.find('Transformer').destroy();
-          g_layer.draw();
-          return;
+            g_stage.find('Transformer').destroy();
+            g_layer.draw();
+            return;
         }
         // remove old transformers
         // TODO: we can skip it if current rect is already selected
         g_stage.find('Transformer').destroy();
-  
+
         // create new transformer
         var tr = new Konva.Transformer({
             rotateEnabled: false
@@ -291,7 +291,7 @@ function init_board() {
         g_layer.draw();
         g_selected_label_rect = e.target;
         make_dirty()
-      })
+    })
 
     document.getElementById('content_space').addEventListener('wheel', (e) => {
         e.preventDefault();
@@ -394,14 +394,14 @@ function reload_record(record) {
 
 
     if (fs.existsSync(get_current_label_file())) {
-        fs.readFile(get_current_label_file(), (err, data)=>{
+        fs.readFile(get_current_label_file(), (err, data) => {
             let text = data.toString()
             console.log(text)
             let lines = text.split('\n')
-            lines.forEach(line=>{
+            lines.forEach(line => {
                 let ww = line.split(',')
-                if (ww.length == 4){
-                    add_new_label(parseInt(ww[0]),parseInt(ww[1]),parseInt(ww[2]),parseInt(ww[3]))
+                if (ww.length == 4) {
+                    add_new_label(parseInt(ww[0]), parseInt(ww[1]), parseInt(ww[2]), parseInt(ww[3]))
                 }
             })
         })
@@ -410,11 +410,23 @@ function reload_record(record) {
 
 function init_keys() {
     window.addEventListener('keydown', function (event) {
-        // console.log(event)
+        console.log(event.keyCode) //65 83 68
         switch (event.keyCode) {
-            case 32:
+            case 32://space
                 enter_space_drag();
                 break
+
+            case 65: //a
+                on_click_add_label()
+                break
+
+            case 83://s
+                on_click_save()
+                break
+
+            case 68:
+                on_click_delete_label()
+                break;
         }
     })
 
@@ -492,7 +504,7 @@ function on_click_routine_add_label(event) {
 
             g_add_label_text = new Konva.Text({
                 x: tmp_pos.x,
-                y: tmp_pos.y-30,
+                y: tmp_pos.y - 30,
                 text: `w:0,h:0`,
                 fontSize: 30,
                 fill: 'orange',
@@ -529,7 +541,7 @@ function on_mousemove_add_label_routine() {
     }
 }
 
-function add_new_label(x,y,w,h) {
+function add_new_label(x, y, w, h) {
 
     let label_rect = new Konva.Rect({
         x: x,
@@ -544,7 +556,7 @@ function add_new_label(x,y,w,h) {
         draggable: true,
         name: 'label'
     });
-    label_rect.on('dragend', function() {
+    label_rect.on('dragend', function () {
         make_dirty()
     });
     g_layer.add(label_rect)
@@ -552,13 +564,13 @@ function add_new_label(x,y,w,h) {
 
 }
 
-let g_dirty  = false
+let g_dirty = false
 function make_dirty() {
     g_dirty = true
     on_dirty_change()
 }
 function on_dirty_change() {
-    if (g_dirty){
+    if (g_dirty) {
         $('#btn_save').css('background', 'red')
         $('#btn_save').css('color', 'white')
     } else {
@@ -567,7 +579,7 @@ function on_dirty_change() {
 }
 
 function get_current_label_file() {
-   return path.join(g_selected_target_element.web_target, g_selected_record_element.web_record + '.label')
+    return path.join(g_selected_target_element.web_target, g_selected_record_element.web_record + '.label')
 }
 
 function on_click_save() {
@@ -576,12 +588,12 @@ function on_click_save() {
 
     let label_rects = g_stage.find('.label')
     let data = ''
-    label_rects.each(function(label_rect){
+    label_rects.each(function (label_rect) {
         console.log(label_rect)
         console.log(label_rect.x(), label_rect.y(), label_rect.width(), label_rect.height())
-        data += `${Math.round(label_rect.x())},${Math.round(label_rect.y())},${Math.round(label_rect.width()*label_rect.scaleX())},${Math.round(label_rect.height()*label_rect.scaleY())}\n`
+        data += `${Math.round(label_rect.x())},${Math.round(label_rect.y())},${Math.round(label_rect.width() * label_rect.scaleX())},${Math.round(label_rect.height() * label_rect.scaleY())}\n`
     })
-    fs.writeFile(get_current_label_file(), data, ()=>{
+    fs.writeFile(get_current_label_file(), data, () => {
         console.log('writed')
     })
 }
