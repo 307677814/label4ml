@@ -305,7 +305,7 @@ function get_real_pos() {
         image_x = image_x / scale;
         image_y = image_y / scale;
         // console.log(image_x, image_y);
-        return {x:image_x, y:image_y}
+        return { x: image_x, y: image_y }
     } else {
         return null
     }
@@ -332,7 +332,7 @@ function refresh_stage_size() {
 function reload_record(record) {
     g_layer.removeChildren()
     g_image = new Image();
-    g_image.src = 'file://'+g_selected_target_element.web_target + '/' + record;
+    g_image.src = 'file://' + g_selected_target_element.web_target + '/' + record;
 
     g_image.onload = () => {
         g_yoda = new Konva.Image({
@@ -386,19 +386,24 @@ function exit_space_drag() {
 }
 
 let ADD_LABEL_STATE = {
-    IDLE:0,
-    TO_START:1,
-    TO_END:2
+    IDLE: 0,
+    TO_START: 1,
+    TO_END: 2
 }
 
 let g_add_label_state = ADD_LABEL_STATE.IDLE
 let g_start_pos = null
 let g_add_label_rect = null
+let g_add_label_text = null
 function on_click_add_label() {
     //开始增加一个节点
     if (g_selected_target_element && g_selected_record_element) {
         g_add_label_state = ADD_LABEL_STATE.TO_START
     }
+}
+
+function gp(ft) {
+    return Math.round(ft)
 }
 
 function on_click_routine_add_label(event) {
@@ -415,11 +420,19 @@ function on_click_routine_add_label(event) {
                 y: tmp_pos.y,
                 width: 0,
                 height: 0,
-                fill: 'green',
-                stroke: 'black',
-                strokeWidth: 4
+                stroke: 'red',
+                strokeWidth: 2
             });
-        
+
+
+            g_add_label_text = new Konva.Text({
+                x: tmp_pos.x,
+                y: tmp_pos.y,
+                text: `w:0,h:0`,
+                fontSize: 30,
+                fontFamily: 'Calibri'
+            });
+
             // add the shape to the layer
             g_layer.add(g_add_label_rect);
             g_layer.draw()
@@ -436,10 +449,13 @@ function on_click_routine_add_label(event) {
 }
 
 function on_mousemove_add_label_routine() {
-    if (g_add_label_state == ADD_LABEL_STATE.TO_END) {   
+    if (g_add_label_state == ADD_LABEL_STATE.TO_END) {
         let tmp_pos = get_real_pos()
         g_add_label_rect.width(tmp_pos.x - g_start_pos.x)
         g_add_label_rect.height(tmp_pos.y - g_start_pos.y)
+
+        g_add_label_text.text(`w:${gp(tmp_pos.x - g_start_pos.x)},h:${gp(tmp_pos.y - g_start_pos.y)}`)
+
         g_layer.draw()
     }
 }
@@ -451,9 +467,11 @@ function add_new_label(start_pos, end_pos) {
         y: start_pos.y,
         width: end_pos.x - start_pos.x,
         height: end_pos.y - start_pos.y,
-        fill: 'blue',
+        fill: 'pink',
         stroke: 'red',
-        strokeWidth: 2
+        strokeWidth: 2,
+        opacity: 0.5,
+        draggable: true
     });
     g_layer.add(label_rect)
     g_layer.draw()
