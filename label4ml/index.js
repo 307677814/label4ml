@@ -91,6 +91,13 @@ function add_new_target_element(target) {
             click: on_click_remove_target.bind(null, new_element)
         }))
 
+        menu.append(new MenuItem({
+            label: utils.lg('查看', 'Reveal'),
+            click: ()=>{
+                electron.remote.shell.openItem(target)
+            }
+        }))
+
         menu.popup({ window: remote.getCurrentWindow() })
     })
 }
