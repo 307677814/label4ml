@@ -8,6 +8,8 @@ macOS/Windows/Linux
 
 ![](scrash/b.jpg)
 
+![](scrash/c.png)
+
 liscense: MIT
 
-(C) 2018 netqon.com
+(C) 2018 inspect.netqon.com 网空视觉工业检测
